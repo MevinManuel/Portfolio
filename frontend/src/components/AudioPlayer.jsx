@@ -9,8 +9,8 @@ const AudioPlayer = ({ onAudioContextChange }) => {
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
 
-  // Using a copyright-free lofi track (placeholder URL - we'll use a real one)
-  const audioSrc = "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3";
+  // Using a placeholder audio file (we'll need to add a real one to public/audio/)
+  const audioSrc = "/audio/lofi-ambient.mp3";
 
   useEffect(() => {
     // Initialize audio context for rhythm analysis
