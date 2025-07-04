@@ -88,7 +88,13 @@ const Portfolio = () => {
                   <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
                     {project.category}
                   </Badge>
-                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors duration-300" />
+                  <ExternalLink 
+                    className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors duration-300 cursor-pointer" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(project.url, '_blank', 'noopener,noreferrer');
+                    }}
+                  />
                 </div>
                 
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300">
