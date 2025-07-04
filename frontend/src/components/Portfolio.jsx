@@ -52,11 +52,12 @@ const Portfolio = () => {
           {filteredProjects.map((project, index) => (
             <div
               key={project.id}
-              className="group relative bg-slate-900 rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 transform hover:-translate-y-2"
+              className="group relative bg-slate-900 rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
               style={{
                 animationDelay: `${index * 100}ms`,
                 animation: 'fadeInUp 0.6s ease-out forwards'
               }}
+              onClick={() => window.open(project.url, '_blank', 'noopener,noreferrer')}
             >
               {/* Project Image */}
               <div className="relative overflow-hidden">
