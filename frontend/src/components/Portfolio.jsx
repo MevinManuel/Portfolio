@@ -73,7 +73,10 @@ const Portfolio = () => {
                     <Button
                       size="sm"
                       className="bg-blue-500 hover:bg-blue-400 text-white w-full"
-                      onClick={() => window.open(project.url, '_blank', 'noopener,noreferrer')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(project.url, '_blank', 'noopener,noreferrer');
+                      }}
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View on GitHub
