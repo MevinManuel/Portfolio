@@ -1,91 +1,63 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Volume2, VolumeX, Music } from 'lucide-react';
+import { LofiGenerator } from '../utils/audioGenerator';
 
 const AudioPlayer = ({ onAudioContextChange }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
-  const audioRef = useRef(null);
-  const audioContextRef = useRef(null);
+  const lofiGeneratorRef = useRef(null);
   const analyserRef = useRef(null);
 
-  // Using a placeholder audio file (we'll need to add a real one to public/audio/)
-  const audioSrc = "/audio/lofi-ambient.mp3";
-
   useEffect(() => {
-    // Initialize audio context for rhythm analysis
-    if (window.AudioContext || window.webkitAudioContext) {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-    }
-
+    lofiGeneratorRef.current = new LofiGenerator();
+    
     return () => {
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
+      if (lofiGeneratorRef.current) {
+        lofiGeneratorRef.current.stop();
       }
     };
   }, []);
 
   const togglePlay = async () => {
-    if (!audioRef.current) return;
-
     try {
       if (isPlaying) {
-        audioRef.current.pause();
+        if (lofiGeneratorRef.current) {
+          lofiGeneratorRef.current.stop();
+        }
         setIsPlaying(false);
         if (onAudioContextChange) {
           onAudioContextChange(null);
         }
       } else {
-        // Resume audio context if suspended
-        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-          await audioContextRef.current.resume();
-        }
-
-        // Connect audio to analyser for rhythm detection
-        if (audioContextRef.current && analyserRef.current && !audioRef.current.connectedToAnalyser) {
-          const source = audioContextRef.current.createMediaElementSource(audioRef.current);
-          source.connect(analyserRef.current);
-          analyserRef.current.connect(audioContextRef.current.destination);
-          audioRef.current.connectedToAnalyser = true;
-        }
-
-        await audioRef.current.play();
+        const audioContext = await lofiGeneratorRef.current.startLofiAmbient();
+        analyserRef.current = lofiGeneratorRef.current.getAnalyser();
+        
         setIsPlaying(true);
         
         if (onAudioContextChange) {
           onAudioContextChange({
             analyser: analyserRef.current,
-            audioContext: audioContextRef.current
+            audioContext: audioContext
           });
         }
       }
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('Error with audio:', error);
     }
   };
 
   const handleVolumeChange = (e) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
+    
+    if (lofiGeneratorRef.current && lofiGeneratorRef.current.masterGain) {
+      lofiGeneratorRef.current.masterGain.gain.value = newVolume * 0.1;
     }
   };
 
   return (
     <>
-      {/* Audio element */}
-      <audio
-        ref={audioRef}
-        src={audioSrc}
-        loop
-        volume={volume}
-        onEnded={() => setIsPlaying(false)}
-        onError={(e) => console.error('Audio error:', e)}
-      />
-
       {/* Music toggle button - bottom left corner */}
       <div className="fixed bottom-4 left-4 z-50 bg-slate-900/90 backdrop-blur-md rounded-xl p-3 border border-slate-700 hover:border-blue-500 transition-all duration-300">
         <div className="flex items-center space-x-3">
