@@ -1,16 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from ..models import Project, ProjectCreate
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
 import logging
+
+# Import database module
+from ..database import db
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-# MongoDB connection
-from ..server import db
 
 @router.post("/portfolio", response_model=Project)
 async def create_project(project_data: ProjectCreate):
