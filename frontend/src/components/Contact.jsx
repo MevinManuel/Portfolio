@@ -5,6 +5,10 @@ import { Textarea } from './ui/textarea';
 import { portfolioData } from '../data/mockData';
 import { Mail, Linkedin, Github, Instagram } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,15 +23,27 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Mock form submission
-    setTimeout(() => {
+    try {
+      // Submit form data to backend
+      const response = await axios.post(`${API}/contact`, formData);
+      
+      if (response.data) {
+        toast({
+          title: "Message sent!",
+          description: "Thanks for reaching out. I'll get back to you soon!",
+        });
+        setFormData({ name: '', email: '', message: '' });
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
       toast({
-        title: "Message sent!",
-        description: "Thanks for reaching out. I'll get back to you soon!",
+        title: "Error sending message",
+        description: "Sorry, there was an error sending your message. Please try again.",
+        variant: "destructive",
       });
-      setFormData({ name: '', email: '', message: '' });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const handleChange = (e) => {
