@@ -6,7 +6,7 @@ import { ExternalLink, Eye } from 'lucide-react';
 
 const Portfolio = () => {
   const [filter, setFilter] = useState('All');
-  const categories = ['All', 'Web Development', 'UI/UX Design', 'Graphic Design', 'Digital Marketing'];
+  const categories = ['All', 'Web Development', 'Mobile Development', 'Machine Learning', 'Computer Vision', 'Creative Coding', 'Programming'];
   
   const filteredProjects = filter === 'All' 
     ? portfolioData.projects 
