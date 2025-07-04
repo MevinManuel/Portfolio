@@ -10,6 +10,8 @@ from typing import List
 import uuid
 from datetime import datetime
 
+# Import route modules
+from .routes import contact, portfolio
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -20,13 +22,16 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(
+    title="Mevin Manuel Portfolio API",
+    description="Backend API for Mevin Manuel's portfolio website",
+    version="1.0.0"
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-
-# Define Models
+# Define Models (keeping the original status check for backward compatibility)
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
@@ -35,10 +40,10 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# Add your routes to the router instead of directly to app
+# Original routes (keeping for backward compatibility)
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World - Portfolio API is running!"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -51,6 +56,10 @@ async def create_status_check(input: StatusCheckCreate):
 async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
+
+# Include the new route modules
+api_router.include_router(contact.router, tags=["contact"])
+api_router.include_router(portfolio.router, tags=["portfolio"])
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -70,6 +79,22 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Portfolio API starting up...")
+    
+    # Create indexes for better performance
+    try:
+        await db.contact_submissions.create_index("created_at")
+        await db.contact_submissions.create_index("id")
+        await db.projects.create_index("created_at")
+        await db.projects.create_index("category")
+        await db.projects.create_index("is_featured")
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.error(f"Error creating indexes: {str(e)}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+    logger.info("Database connection closed")
