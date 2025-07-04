@@ -6,10 +6,13 @@ import About from './components/About';
 import Portfolio from './components/Portfolio';
 import Services from './components/Services';
 import Contact from './components/Contact';
+import AudioPlayer from './components/AudioPlayer';
 import './App.css';
 
 function App() {
   const [activeSection, setActiveSection] = useState('hero');
+  const [audioContext, setAudioContext] = useState(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -19,6 +22,11 @@ function App() {
         block: 'start'
       });
     }
+  };
+
+  const handleAudioContextChange = (context) => {
+    setAudioContext(context);
+    setIsAudioPlaying(context !== null);
   };
 
   useEffect(() => {
@@ -48,12 +56,16 @@ function App() {
       
       <main>
         <Hero scrollToSection={scrollToSection} />
-        <About />
+        <About 
+          audioContext={audioContext} 
+          isAudioPlaying={isAudioPlaying}
+        />
         <Portfolio />
         <Services />
         <Contact />
       </main>
       
+      <AudioPlayer onAudioContextChange={handleAudioContextChange} />
       <Toaster />
     </div>
   );

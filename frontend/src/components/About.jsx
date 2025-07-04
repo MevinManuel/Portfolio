@@ -3,8 +3,9 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { portfolioData } from '../data/mockData';
 import { Download } from 'lucide-react';
+import RhythmClicker from './RhythmClicker';
 
-const About = () => {
+const About = ({ audioContext, isAudioPlaying }) => {
   const handleResumeDownload = () => {
     // Mock download functionality
     const link = document.createElement('a');
@@ -19,7 +20,7 @@ const About = () => {
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
@@ -28,9 +29,9 @@ const About = () => {
             <div className="w-24 h-1 bg-blue-500 mx-auto rounded-full"></div>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Bio */}
-            <div className="space-y-6">
+          <div className="grid lg:grid-cols-3 gap-12 items-start">
+            {/* Left Column - Bio & Resume */}
+            <div className="lg:col-span-1 space-y-6">
               <p className="text-lg text-slate-300 leading-relaxed">
                 {portfolioData.about.bio}
               </p>
@@ -50,47 +51,55 @@ const About = () => {
                   Download Resume
                 </Button>
               </div>
-            </div>
-            
-            {/* Right Column - Tools & Skills */}
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-white mb-6">
-                Tools & Technologies
-              </h3>
-              
-              <div className="grid gap-4">
-                {/* Development Tools */}
-                <div>
-                  <h4 className="text-lg font-semibold text-blue-300 mb-3">Development</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {portfolioData.about.tools.slice(0, 5).map((tool, index) => (
-                      <Badge 
-                        key={index}
-                        variant="secondary"
-                        className="bg-slate-800 text-slate-300 hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer"
-                      >
-                        {tool}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+
+              {/* Tools & Skills */}
+              <div className="space-y-6 pt-6">
+                <h3 className="text-2xl font-bold text-white mb-6">
+                  Tools & Technologies
+                </h3>
                 
-                {/* Design Tools */}
-                <div>
-                  <h4 className="text-lg font-semibold text-blue-300 mb-3">Design</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {portfolioData.about.tools.slice(5).map((tool, index) => (
-                      <Badge 
-                        key={index}
-                        variant="secondary"
-                        className="bg-slate-800 text-slate-300 hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer"
-                      >
-                        {tool}
-                      </Badge>
-                    ))}
+                <div className="grid gap-4">
+                  {/* Development Tools */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-blue-300 mb-3">Development</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {portfolioData.about.tools.slice(0, 6).map((tool, index) => (
+                        <Badge 
+                          key={index}
+                          variant="secondary"
+                          className="bg-slate-800 text-slate-300 hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer"
+                        >
+                          {tool}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Design & Other Tools */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-blue-300 mb-3">Other</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {portfolioData.about.tools.slice(6).map((tool, index) => (
+                        <Badge 
+                          key={index}
+                          variant="secondary"
+                          className="bg-slate-800 text-slate-300 hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer"
+                        >
+                          {tool}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Right Column - Mini Game */}
+            <div className="lg:col-span-2">
+              <RhythmClicker 
+                audioContext={audioContext} 
+                isAudioPlaying={isAudioPlaying}
+              />
             </div>
           </div>
         </div>
