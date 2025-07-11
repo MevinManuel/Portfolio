@@ -1,5 +1,5 @@
 import React from 'react';
-import { portfolioData } from '../data/mockData';
+import { portfolioData } from '../mockData';
 import { Code, Palette, Image, CheckCircle } from 'lucide-react';
 
 const Services = () => {
@@ -11,23 +11,19 @@ const Services = () => {
 
   return (
     <section id="services" className="py-20 bg-slate-900 relative overflow-hidden">
-      {/* Background decorations */}
       <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-20 w-72 h-72 bg-blue-400/5 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Services
           </h2>
           <div className="w-24 h-1 bg-blue-500 mx-auto rounded-full mb-8"></div>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Comprehensive digital solutions from concept to completion
-          </p>
+          Smart solutions from sketch to screen.          </p>
         </div>
         
-        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {portfolioData.services.map((service, index) => {
             const IconComponent = iconMap[service.icon];
@@ -41,24 +37,20 @@ const Services = () => {
                   animation: 'fadeInUp 0.6s ease-out forwards'
                 }}
               >
-                {/* Service Icon */}
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-all duration-300">
                     <IconComponent className="w-8 h-8 text-blue-400 group-hover:text-blue-300 transition-colors duration-300" />
                   </div>
                 </div>
                 
-                {/* Service Title */}
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-300 transition-colors duration-300">
                   {service.title}
                 </h3>
                 
-                {/* Service Description */}
                 <p className="text-slate-400 mb-6 leading-relaxed">
                   {service.description}
                 </p>
                 
-                {/* Features List */}
                 <ul className="space-y-3">
                   {service.features.map((feature, featureIndex) => (
                     <li
@@ -71,7 +63,6 @@ const Services = () => {
                   ))}
                 </ul>
                 
-                {/* Hover border effect */}
                 <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-blue-500/20 transition-all duration-300"></div>
               </div>
             );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { portfolioData } from '../data/mockData';
+import { portfolioData } from '../mockData';
 import { ExternalLink, Eye } from 'lucide-react';
 
 const Portfolio = () => {
@@ -14,11 +14,9 @@ const Portfolio = () => {
 
   return (
     <section id="portfolio" className="py-20 bg-slate-800 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-10"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Featured Work
@@ -29,25 +27,25 @@ const Portfolio = () => {
           </p>
         </div>
         
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              onClick={() => setFilter(category)}
-              variant={filter === category ? "default" : "outline"}
-              className={`transition-all duration-300 ${
-                filter === category 
-                  ? 'bg-blue-500 hover:bg-blue-400 text-white' 
-                  : 'border-slate-600 text-slate-300 hover:border-blue-500 hover:text-blue-300'
-              }`}
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
+<div className="flex flex-wrap justify-center gap-4 mb-12">
+  {categories.map((category) => (
+    <Button
+      key={category}
+      onClick={() => setFilter(category)}
+      variant={filter === category ? "default" : "outline"}
+      className={`transition-all duration-300 backdrop-blur-md rounded-xl px-6 py-3 shadow-md
+        ${
+          filter === category
+            ? 'bg-blue-500/60 hover:bg-blue-400/70 text-white'
+            : 'bg-white/10 border border-white/20 text-slate-200 hover:bg-white/20 hover:text-white-900 hover:border-blue-400/60'
+        }`}
+    >
+      {category}
+    </Button>
+  ))}
+</div>
+
         
-        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProjects.map((project, index) => (
             <div
@@ -59,7 +57,6 @@ const Portfolio = () => {
               }}
               onClick={() => window.open(project.url, '_blank', 'noopener,noreferrer')}
             >
-              {/* Project Image */}
               <div className="relative overflow-hidden">
                 <img 
                   src={project.image} 
@@ -67,7 +64,6 @@ const Portfolio = () => {
                   className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 
-                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-4 left-4 right-4">
                     <Button
@@ -85,7 +81,6 @@ const Portfolio = () => {
                 </div>
               </div>
               
-              {/* Project Info */}
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
                   <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
@@ -108,7 +103,6 @@ const Portfolio = () => {
                   {project.description}
                 </p>
                 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-2">
                   {project.tags.map((tag, tagIndex) => (
                     <Badge 

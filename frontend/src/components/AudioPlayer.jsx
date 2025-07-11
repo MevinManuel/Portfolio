@@ -1,130 +1,86 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { Volume2, VolumeX, Music } from 'lucide-react';
-import { LofiGenerator } from '../utils/audioGenerator';
+import { ChevronLeft, ChevronRight, Music, X } from 'lucide-react';
 
-const AudioPlayer = ({ onAudioContextChange }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.3);
-  const lofiGeneratorRef = useRef(null);
-  const analyserRef = useRef(null);
+const spotifyTrackIds = [
+    '25h0TqC9H3BcMA7KjK5nHK',
+  '5expoVGQPvXuwBBFuNGqBd',
+  '7pc3hxGf3xLsYXGKitStzP',
+  '3FiNmQRoJNoqQ8UXbTv1zt',
+  '7mVobUmGP12Y5SQJgBice3'
+];
 
-  useEffect(() => {
-    lofiGeneratorRef.current = new LofiGenerator();
-    
-    return () => {
-      if (lofiGeneratorRef.current) {
-        lofiGeneratorRef.current.stop();
-      }
-    };
-  }, []);
+const AudioPlayer = () => {
+  const [trackIndex, setTrackIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const togglePlay = async () => {
-    try {
-      if (isPlaying) {
-        if (lofiGeneratorRef.current) {
-          lofiGeneratorRef.current.stop();
-        }
-        setIsPlaying(false);
-        if (onAudioContextChange) {
-          onAudioContextChange(null);
-        }
-      } else {
-        const audioContext = await lofiGeneratorRef.current.startLofiAmbient();
-        analyserRef.current = lofiGeneratorRef.current.getAnalyser();
-        
-        setIsPlaying(true);
-        
-        if (onAudioContextChange) {
-          onAudioContextChange({
-            analyser: analyserRef.current,
-            audioContext: audioContext
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error with audio:', error);
-    }
+  const toggleExpand = () => setIsExpanded(!isExpanded);
+
+  const nextTrack = () => {
+    setTrackIndex((prev) => (prev + 1) % spotifyTrackIds.length);
   };
 
-  const handleVolumeChange = (e) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    
-    if (lofiGeneratorRef.current && lofiGeneratorRef.current.masterGain) {
-      lofiGeneratorRef.current.masterGain.gain.value = newVolume * 0.1;
-    }
+  const prevTrack = () => {
+    setTrackIndex((prev) => (prev === 0 ? spotifyTrackIds.length - 1 : prev - 1));
   };
 
   return (
-    <>
-      {/* Music toggle button - bottom left corner */}
-      <div className="fixed bottom-4 left-4 z-50 bg-slate-900/90 backdrop-blur-md rounded-xl p-3 border border-slate-700 hover:border-blue-500 transition-all duration-300">
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={togglePlay}
-            variant="ghost"
-            size="sm"
-            className="text-slate-300 hover:text-blue-400 hover:bg-slate-800 transition-all duration-300"
-          >
-            {isPlaying ? (
-              <Volume2 className="w-5 h-5" />
-            ) : (
-              <VolumeX className="w-5 h-5" />
-            )}
+    <div className="fixed bottom-4 left-4 z-50">
+      <div
+        className={`bg-slate-900/90 w-[320px] rounded-xl p-3 border border-slate-700 backdrop-blur-md shadow-xl transition-all duration-500 ${
+          isExpanded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none h-0'
+        }`}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <Button onClick={prevTrack} size="sm" variant="ghost" className="text-slate-300 hover:text-blue-400">
+            <ChevronLeft className="w-5 h-5" />
           </Button>
-          
-          {/* Volume slider - shows when playing */}
-          {isPlaying && (
-            <div className="flex items-center space-x-2 animate-in slide-in-from-left duration-300">
-              <Music className="w-4 h-4 text-blue-400" />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
-                style={{
-                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${volume * 100}%, #475569 ${volume * 100}%, #475569 100%)`
-                }}
-              />
-            </div>
-          )}
-        </div>
-        
-        {/* Now playing indicator */}
-        {isPlaying && (
-          <div className="text-xs text-slate-400 mt-1 animate-pulse">
-            ♪ Lo-fi ambient
+
+          <div className="text-slate-300 text-sm flex items-center gap-1 font-medium">
+            <Music className="w-4 h-4 text-blue-400" />
+            Recent Favs :)
           </div>
-        )}
+
+          <Button onClick={nextTrack} size="sm" variant="ghost" className="text-slate-300 hover:text-blue-400">
+            <ChevronRight className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Spotify Embed */}
+        <div className="overflow-hidden rounded-lg">
+          <iframe
+            title="Spotify Preview"
+            src={`https://open.spotify.com/embed/track/${spotifyTrackIds[trackIndex]}?utm_source=generator`}
+            width="100%"
+            height="80"
+            frameBorder="0"
+            allow="encrypted-media"
+            className="rounded-md"
+          ></iframe>
+        </div>
+
+        <div className="mt-3 flex justify-end">
+          <Button
+            onClick={toggleExpand}
+            size="sm"
+            variant="ghost"
+            className="text-slate-400 hover:text-green-400 text-xs"
+          >
+            <X className="w-4 h-4 mr-1" />
+            minimize
+          </Button>
+        </div>
       </div>
 
-      {/* CSS for volume slider */}
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: #3b82f6;
-          cursor: pointer;
-          box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
-        }
-
-        .slider::-moz-range-thumb {
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: #3b82f6;
-          cursor: pointer;
-          border: none;
-          box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
-        }
-      `}</style>
-    </>
+      {!isExpanded && (
+        <button
+          onClick={toggleExpand}
+          className="bg-slate-900/90 border border-slate-700 hover:border-blue-500 backdrop-blur-md p-3 rounded-full text-white shadow-lg transition-all duration-300"
+        >
+          <Music className="w-5 h-5 text-blue-400" />
+        </button>
+      )}
+    </div>
   );
 };
 

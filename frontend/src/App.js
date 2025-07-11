@@ -7,12 +7,18 @@ import Portfolio from './components/Portfolio';
 import Services from './components/Services';
 import Contact from './components/Contact';
 import AudioPlayer from './components/AudioPlayer';
+import CustomCursor from './components/CustomCursor';
+import IntroGame from './components/IntroGame';
+import ScrollGallery from './components/ScrollGallery';
+import EasterEggSearch from './components/EasterEggSearch';
+
 import './App.css';
 
 function App() {
   const [activeSection, setActiveSection] = useState('hero');
   const [audioContext, setAudioContext] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [showGame, setShowGame] = useState(true);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -47,8 +53,14 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  if (showGame) {
+    return <IntroGame onEnter={() => setShowGame(false)} />;
+  }
+
+
   return (
     <div className="App min-h-screen bg-slate-900">
+      <CustomCursor />
       <Navigation 
         activeSection={activeSection} 
         scrollToSection={scrollToSection} 
@@ -60,9 +72,12 @@ function App() {
           audioContext={audioContext} 
           isAudioPlaying={isAudioPlaying}
         />
+         <ScrollGallery /> 
         <Portfolio />
         <Services />
         <Contact />
+        <EasterEggSearch />
+
       </main>
       
       <AudioPlayer onAudioContextChange={handleAudioContextChange} />

@@ -1,0 +1,79 @@
+.easter-egg-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #0f172a, #0f172a);
+  color: white;
+  flex-wrap: wrap;
+}
+
+.easter-text {
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.easter-form {
+  display: flex;
+  align-items: center;
+}
+
+.easter-form input {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  width: 220px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.easter-form input::placeholder {
+  color: #888;
+}
+
+.hint-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.hint-box {
+  background-color: #1e293b;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  max-width: 320px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.easter-form button {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  color: white;
+  background-color: #38bdf8;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.easter-form button:hover {
+  background-color: #0ea5e9;
+}
+
+.success-msg {
+  width: 100%;
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #22c55e;
+  font-weight: bold;
+}

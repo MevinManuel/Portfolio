@@ -38,7 +38,6 @@ const Navigation = ({ activeSection, scrollToSection }) => {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <div 
             className="text-2xl font-bold text-white cursor-pointer hover:text-blue-400 transition-colors duration-300"
             onClick={() => scrollToSection('hero')}
@@ -46,7 +45,6 @@ const Navigation = ({ activeSection, scrollToSection }) => {
             MM
           </div>
           
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <button
@@ -63,7 +61,6 @@ const Navigation = ({ activeSection, scrollToSection }) => {
             ))}
           </div>
           
-          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -77,7 +74,6 @@ const Navigation = ({ activeSection, scrollToSection }) => {
         </div>
       </div>
       
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-700">
           <div className="container mx-auto px-4 py-4">
