@@ -277,31 +277,31 @@ const IntroGame = ({ onEnter }) => {
         }
 
         // Ball-bubble collision
-        let bubblePopped = false;
-        setBubbles((prevBubbles) =>
-          prevBubbles.map((b) => {
-            if (!b.popped) {
-              const bubbleCenterX = b.x + BUBBLE_SIZE / 2;
-              const bubbleCenterY = b.y + BUBBLE_SIZE / 2;
-              if (
-                checkCollision(
-                  { x, y },
-                  { x: bubbleCenterX, y: bubbleCenterY },
-                  BALL_RADIUS,
-                  BUBBLE_SIZE / 2
-                )
-              ) {
-                dy = -dy;
-                bubblePopped = true;
-                return { ...b, popped: true };
-              }
-            }
-            return b;
-          })
-        );
-        if (bubblePopped) {
-          setProgress((prev) => Math.min(prev + 5, 100));
-        }
+        let bubblesPoppedThisFrame = 0;
+setBubbles((prevBubbles) =>
+  prevBubbles.map((b) => {
+    if (!b.popped) {
+      const bubbleCenterX = b.x + BUBBLE_SIZE / 2;
+      const bubbleCenterY = b.y + BUBBLE_SIZE / 2;
+      if (
+        checkCollision(
+          { x, y },
+          { x: bubbleCenterX, y: bubbleCenterY },
+          BALL_RADIUS,
+          BUBBLE_SIZE / 2
+        )
+      ) {
+        dy = -dy;
+        bubblesPoppedThisFrame++;
+        return { ...b, popped: true };
+      }
+    }
+    return b;
+  })
+);
+if (bubblesPoppedThisFrame > 0) {
+  setProgress((prev) => Math.min(prev + bubblesPoppedThisFrame * 5, 100));
+}
 
         // Reset ball if it goes off screen
         if (y > GAME_HEIGHT - BALL_RADIUS) {
@@ -424,6 +424,11 @@ const IntroGame = ({ onEnter }) => {
     className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
     onTouchStart={() => setKeys((prev) => ({ ...prev, left: true }))}
     onTouchEnd={() => setKeys((prev) => ({ ...prev, left: false }))}
+    style={{
+    userSelect: "none",
+    WebkitUserSelect: "none",
+    touchAction: "none",
+  }}
   >
     ◀
   </button>
@@ -431,6 +436,11 @@ const IntroGame = ({ onEnter }) => {
     className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
     onTouchStart={() => setKeys((prev) => ({ ...prev, right: true }))}
     onTouchEnd={() => setKeys((prev) => ({ ...prev, right: false }))}
+    style={{
+    userSelect: "none",
+    WebkitUserSelect: "none",
+    touchAction: "none",
+  }}
   >
     ▶
   </button>
