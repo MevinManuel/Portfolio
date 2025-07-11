@@ -417,6 +417,25 @@ const IntroGame = ({ onEnter }) => {
             >
               Enter Portfolio
             </button>
+
+            {/* Mobile Left/Right Controls */}
+<div className="absolute bottom-0 left-0 w-full z-40 flex justify-between md:hidden px-8 pb-6">
+  <button
+    className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
+    onTouchStart={() => setKeys((prev) => ({ ...prev, left: true }))}
+    onTouchEnd={() => setKeys((prev) => ({ ...prev, left: false }))}
+  >
+    ◀
+  </button>
+  <button
+    className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
+    onTouchStart={() => setKeys((prev) => ({ ...prev, right: true }))}
+    onTouchEnd={() => setKeys((prev) => ({ ...prev, right: false }))}
+  >
+    ▶
+  </button>
+</div>
+
           </div>
 
           {/* Bubbles */}
@@ -454,9 +473,18 @@ className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10p
 
 
           {/* Slider */}
+          {/* Slider */}
 <div
   className="absolute bottom-6 left-0 w-full flex justify-center z-30"
-  ref={gameAreaRef}
+  onMouseMove={(e) => {
+    if (e.buttons === 1) handleSliderDrag(e);
+  }}
+  onTouchMove={(e) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      handleSliderDrag({ clientX: touch.clientX });
+    }
+  }}
 >
   <div
     className="bg-gradient-to-r from-slate-600 to-slate-700 rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all"
@@ -465,7 +493,6 @@ className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10p
       width: SLIDER_WIDTH,
       left: sliderX,
       position: "absolute",
-      touchAction: "none", // prevent scroll while dragging on mobile
     }}
     onMouseDown={(e) => {
       e.preventDefault();
@@ -487,12 +514,11 @@ className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10p
         window.removeEventListener("touchmove", move);
         window.removeEventListener("touchend", end);
       };
-      window.addEventListener("touchmove", move, { passive: false });
+      window.addEventListener("touchmove", move);
       window.addEventListener("touchend", end);
     }}
   />
 </div>
-
 
 
           {/* Start Game */}
