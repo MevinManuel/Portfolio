@@ -13,7 +13,6 @@ import ScrollGallery from './components/ScrollGallery';
 import EasterEggSearch from './components/EasterEggSearch';
 
 import './App.css';
-
 function App() {
   const [activeSection, setActiveSection] = useState('hero');
   const [audioContext, setAudioContext] = useState(null);
@@ -35,6 +34,14 @@ function App() {
     setIsAudioPlaying(context !== null);
   };
 
+  // ✅ Skip game if on small screen
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setShowGame(false);  // Skip game on phones
+    }
+  }, []);
+
+  // Section tracking on scroll
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['hero', 'about', 'portfolio', 'services', 'contact'];
@@ -57,7 +64,6 @@ function App() {
     return <IntroGame onEnter={() => setShowGame(false)} />;
   }
 
-
   return (
     <div className="App min-h-screen bg-slate-900">
       <CustomCursor />
@@ -77,7 +83,6 @@ function App() {
         <Services />
         <Contact />
         <EasterEggSearch />
-
       </main>
       
       <AudioPlayer onAudioContextChange={handleAudioContextChange} />
@@ -85,5 +90,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
