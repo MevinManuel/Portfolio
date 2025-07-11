@@ -5,9 +5,18 @@ const CustomCursor = () => {
   const tailRef = useRef(null);
   const rippleRef = useRef(null);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const mobile = window.innerWidth <= 768;
+    setIsMobile(mobile);
+  }, []);
 
   // Track mouse
   useEffect(() => {
+    if (isMobile) return;
+
     const move = (e) => {
       setCoords({ x: e.clientX, y: e.clientY });
       if (rippleRef.current) {
@@ -18,10 +27,12 @@ const CustomCursor = () => {
 
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
-  }, []);
+  }, [isMobile]);
 
   // Tail follow
   useEffect(() => {
+    if (isMobile) return;
+
     const follow = () => {
       if (tailRef.current) {
         tailRef.current.style.left = `${coords.x}px`;
@@ -30,10 +41,12 @@ const CustomCursor = () => {
       requestAnimationFrame(follow);
     };
     follow();
-  }, [coords]);
+  }, [coords, isMobile]);
 
   // Ripple on click
   useEffect(() => {
+    if (isMobile) return;
+
     const click = () => {
       if (rippleRef.current) {
         rippleRef.current.classList.remove("ripple");
@@ -44,17 +57,19 @@ const CustomCursor = () => {
 
     window.addEventListener("click", click);
     return () => window.removeEventListener("click", click);
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) return null; // ❌ Skip rendering on mobile
 
   return (
     <>
+      <style>{`
+        @media (min-width: 769px) {
+          body, *, button, a, input, textarea, select {
+            cursor: none !important;
+          }
+        }
 
-    <style>{`
-  body, *, button, a, input, textarea, select {
-    cursor: none !important;
-  }
-
-      
         .ripple-effect {
           position: fixed;
           width: 40px;

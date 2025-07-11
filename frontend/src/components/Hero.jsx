@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './ui/button';
 import { portfolioData } from '../mockData';
-const bgImg = "/data/bg4.png";
+const bgImg = "/data/bg4.jpg";
 import { ArrowRight } from 'lucide-react';
 
 const Hero = ({ scrollToSection }) => {

@@ -29,30 +29,30 @@ const Navigation = ({ activeSection, scrollToSection }) => {
   };
 
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-700' 
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 overflow-x-hidden ${
+        isScrolled
+          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-700'
           : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div 
+          <div
             className="text-2xl font-bold text-white cursor-pointer hover:text-blue-400 transition-colors duration-300"
-            onClick={() => scrollToSection('hero')}
+            onClick={() => handleNavClick('hero')}
           >
             MM
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
                 className={`text-sm font-medium transition-colors duration-300 hover:text-blue-400 ${
-                  activeSection === item.id 
-                    ? 'text-blue-400' 
+                  activeSection === item.id
+                    ? 'text-blue-400'
                     : 'text-slate-300'
                 }`}
               >
@@ -60,7 +60,7 @@ const Navigation = ({ activeSection, scrollToSection }) => {
               </button>
             ))}
           </div>
-          
+
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -73,18 +73,18 @@ const Navigation = ({ activeSection, scrollToSection }) => {
           </div>
         </div>
       </div>
-      
+
       {isMenuOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-700">
-          <div className="container mx-auto px-4 py-4">
+        <div className="md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-700 w-full">
+          <div className="w-full max-w-screen-xl mx-auto px-4 py-4">
             <div className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   className={`text-left text-sm font-medium transition-colors duration-300 hover:text-blue-400 ${
-                    activeSection === item.id 
-                      ? 'text-blue-400' 
+                    activeSection === item.id
+                      ? 'text-blue-400'
                       : 'text-slate-300'
                   }`}
                 >
