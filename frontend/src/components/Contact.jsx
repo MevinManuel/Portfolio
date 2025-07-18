@@ -5,6 +5,7 @@ import { Mail, Linkedin, Github, Instagram, Pin } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import RhythmClicker from './RhythmClicker'; 
 
+const minimalBlueBg = "/data/25.png";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,18 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-slate-800 relative overflow-hidden">
+    <section 
+      id="contact" 
+      className="py-20 bg-slate-800 relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${minimalBlueBg})`,
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        opacity: 0.9,
+      }}
+    >
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>

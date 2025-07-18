@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 const bgImg = "/data/bg2.png";
 
-const BUBBLE_COUNT = 120;
 const BUBBLE_SIZE = 25;
 const BALL_RADIUS = 12;
 const SLIDER_WIDTH = 140;
@@ -117,10 +116,10 @@ const IntroGame = ({ onEnter }) => {
 
     const word = "OOXFOLIOXOO";
     const bubbleSize = Math.max(15, Math.min(25, gameW / 40));
-    const letterSpacing = bubbleSize * 0.4; 
+    const letterSpacing = bubbleSize * 0.4;
     const totalWordWidth = word.length * 8 * bubbleSize + (word.length - 1) * letterSpacing;
-    const startX = (gameW - totalWordWidth) / 2; 
-    const startY = gameH * 0.15; 
+    const startX = (gameW - totalWordWidth) / 2;
+    const startY = gameH * 0.15;
 
     let currentX = startX;
     let id = 0;
@@ -138,24 +137,23 @@ const IntroGame = ({ onEnter }) => {
                 y: startY + row * bubbleSize,
                 popped: false,
                 id: id++,
-                dx: (Math.random() - 0.5) * 0.5,
-                dy: (Math.random() - 0.5) * 0.5,
                 size: bubbleSize,
               });
             }
           }
         }
-        currentX += (8 * bubbleSize) + letterSpacing; // Move to next letter position
+        currentX += 8 * bubbleSize + letterSpacing;
       }
     }
 
     return bubblesArray;
   });
+
   const [ball, setBall] = useState({
     x: GAME_WIDTH / 2,
     y: GAME_HEIGHT - 100,
-    dx: 4,
-    dy: -5,
+    dx: 5, // Increased from 4
+    dy: -6, // Increased from -5
   });
   const [sliderX, setSliderX] = useState(GAME_WIDTH / 2 - SLIDER_WIDTH / 2);
   const [gameStarted, setGameStarted] = useState(false);
@@ -164,7 +162,7 @@ const IntroGame = ({ onEnter }) => {
   const [swipeOut, setSwipeOut] = useState(false);
   const gameAreaRef = useRef(null);
 
-  // --- Utility functions ---
+  // Utility: Check collision between two circles
   const checkCollision = (obj1, obj2, r1, r2) => {
     const dx = obj1.x - obj2.x;
     const dy = obj1.y - obj2.y;
@@ -172,53 +170,7 @@ const IntroGame = ({ onEnter }) => {
     return distance < r1 + r2;
   };
 
-  const handleBubbleCollisions = (bubbleList) => {
-    const newBubbles = [...bubbleList];
-    for (let i = 0; i < newBubbles.length; i++) {
-      for (let j = i + 1; j < newBubbles.length; j++) {
-        const b1 = newBubbles[i];
-        const b2 = newBubbles[j];
-        if (!b1.popped && !b2.popped) {
-          const centerX1 = b1.x + BUBBLE_SIZE / 2;
-          const centerY1 = b1.y + BUBBLE_SIZE / 2;
-          const centerX2 = b2.x + BUBBLE_SIZE / 2;
-          const centerY2 = b2.y + BUBBLE_SIZE / 2;
-          if (
-            checkCollision(
-              { x: centerX1, y: centerY1 },
-              { x: centerX2, y: centerY2 },
-              BUBBLE_SIZE / 2,
-              BUBBLE_SIZE / 2
-            )
-          ) {
-            // Simple elastic collision
-            const tempDx = b1.dx;
-            const tempDy = b1.dy;
-            b1.dx = b2.dx;
-            b1.dy = b2.dy;
-            b2.dx = tempDx;
-            b2.dy = tempDy;
-            // Separate overlapping bubbles
-            const dx = centerX2 - centerX1;
-            const dy = centerY2 - centerY1;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const overlap = BUBBLE_SIZE - distance;
-            if (overlap > 0) {
-              const separationX = (dx / distance) * (overlap / 2);
-              const separationY = (dy / distance) * (overlap / 2);
-              b1.x -= separationX;
-              b1.y -= separationY;
-              b2.x += separationX;
-              b2.y += separationY;
-            }
-          }
-        }
-      }
-    }
-    return newBubbles;
-  };
-
-  // --- Keyboard controls ---
+  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "ArrowLeft") setKeys((prev) => ({ ...prev, left: true }));
@@ -236,7 +188,7 @@ const IntroGame = ({ onEnter }) => {
     };
   }, []);
 
-  // --- Paddle movement ---
+  // Paddle movement
   useEffect(() => {
     if (!gameStarted) return;
     const interval = setInterval(() => {
@@ -250,7 +202,7 @@ const IntroGame = ({ onEnter }) => {
     return () => clearInterval(interval);
   }, [gameStarted, keys, GAME_WIDTH]);
 
-  // --- Ball and bubble movement ---
+  // Game loop: Move ball and check collisions
   useEffect(() => {
     if (!gameStarted) return;
     const interval = setInterval(() => {
@@ -259,11 +211,11 @@ const IntroGame = ({ onEnter }) => {
         x += dx;
         y += dy;
 
-        // Ball wall collisions
+        // Wall collisions
         if (x < BALL_RADIUS || x > GAME_WIDTH - BALL_RADIUS) dx = -dx;
         if (y < BALL_RADIUS) dy = -dy;
 
-        // Ball-slider collision
+        // Paddle collision
         if (
           y >= GAME_HEIGHT - SLIDER_HEIGHT - BALL_RADIUS - 20 &&
           x > sliderX &&
@@ -271,82 +223,64 @@ const IntroGame = ({ onEnter }) => {
           dy > 0
         ) {
           dy = -dy;
-          // Add some angle based on where it hits the slider
           const hitPos = (x - sliderX) / SLIDER_WIDTH;
           dx = (hitPos - 0.5) * 6;
         }
 
-        // Ball-bubble collision
-        let bubblesPoppedThisFrame = 0;
-setBubbles((prevBubbles) =>
-  prevBubbles.map((b) => {
-    if (!b.popped) {
-      const bubbleCenterX = b.x + BUBBLE_SIZE / 2;
-      const bubbleCenterY = b.y + BUBBLE_SIZE / 2;
-      if (
-        checkCollision(
-          { x, y },
-          { x: bubbleCenterX, y: bubbleCenterY },
-          BALL_RADIUS,
-          BUBBLE_SIZE / 2
-        )
-      ) {
-        dy = -dy;
-        bubblesPoppedThisFrame++;
-        return { ...b, popped: true };
-      }
-    }
-    return b;
-  })
-);
-if (bubblesPoppedThisFrame > 0) {
-  setProgress((prev) => Math.min(prev + bubblesPoppedThisFrame * 5, 100));
-}
-
-        // Reset ball if it goes off screen
-        if (y > GAME_HEIGHT - BALL_RADIUS) {
+        // Reset if off bottom
+        if (y > GAME_HEIGHT + BALL_RADIUS) {
           x = GAME_WIDTH / 2;
           y = GAME_HEIGHT - 100;
-          dx = 4;
-          dy = -5;
+          dx = 5; // Increased from 4
+          dy = -6; // Increased from -5
         }
 
         return { x, y, dx, dy };
       });
 
-      // Move bubbles with collision detection
-      setBubbles((prev) => {
-        let newBubbles = prev.map((b) => {
-          if (b.popped) return b;
-          let newX = b.x + b.dx;
-          let newY = b.y + b.dy;
-          let newDx = b.dx;
-          let newDy = b.dy;
-          // Bubble wall collisions
-          if (newX < 0 || newX > GAME_WIDTH - BUBBLE_SIZE) {
-            newDx = -newDx;
-            newX = Math.max(0, Math.min(GAME_WIDTH - BUBBLE_SIZE, newX));
+      // Check ball-bubble collisions (after ball update)
+      setBubbles((prevBubbles) => {
+        let poppedThisFrame = 0;
+        const newBubbles = prevBubbles.map((b) => {
+          if (!b.popped) {
+            const bubbleCenterX = b.x + (b.size || BUBBLE_SIZE) / 2;
+            const bubbleCenterY = b.y + (b.size || BUBBLE_SIZE) / 2;
+            if (
+              checkCollision(
+                ball,
+                { x: bubbleCenterX, y: bubbleCenterY },
+                BALL_RADIUS,
+                (b.size || BUBBLE_SIZE) / 2
+              )
+            ) {
+              poppedThisFrame++;
+              return { ...b, popped: true };
+            }
           }
-          if (newY < 0 || newY > GAME_HEIGHT - BUBBLE_SIZE - 80) {
-            newDy = -newDy;
-            newY = Math.max(0, Math.min(GAME_HEIGHT - BUBBLE_SIZE - 80, newY));
-          }
-          return { ...b, x: newX, y: newY, dx: newDx, dy: newDy };
+          return b;
         });
-        return handleBubbleCollisions(newBubbles);
+
+        if (poppedThisFrame > 0) {
+          setProgress((prev) => Math.min(prev + poppedThisFrame * 2, 100));
+          // Bounce the ball on pop
+          setBall((prev) => ({ ...prev, dy: -prev.dy }));
+        }
+
+        return newBubbles;
       });
     }, 16);
     return () => clearInterval(interval);
-  }, [gameStarted, sliderX, GAME_WIDTH, GAME_HEIGHT]);
+  }, [gameStarted, sliderX, GAME_WIDTH, GAME_HEIGHT, ball]); // Depend on ball for collision checks
 
-  const handleSliderDrag = (e) => {
+  // Slider drag handler (mouse/touch)
+  const handleSliderDrag = (clientX) => {
     const rect = gameAreaRef.current.getBoundingClientRect();
-    let x = e.clientX - rect.left - SLIDER_WIDTH / 2;
+    let x = clientX - rect.left - SLIDER_WIDTH / 2;
     x = Math.max(0, Math.min(GAME_WIDTH - SLIDER_WIDTH, x));
     setSliderX(x);
   };
 
-  // Update progress when a bubble is popped by click
+  // Pop bubble on click/tap (+1 progress)
   const handleBubblePop = (id) => {
     setBubbles((prev) =>
       prev.map((bubble) =>
@@ -358,38 +292,34 @@ if (bubblesPoppedThisFrame > 0) {
 
   const showEnter = progress >= 100;
 
-  // Handler for Enter button
+  // Enter handler
   const handleEnter = () => {
     setSwipeOut(true);
     setTimeout(() => {
       onEnter();
-    }, 500); // Duration matches the animation
+    }, 500);
   };
 
   return (
-   <div
-  className={`min-h-screen flex items-center justify-center 
-    ${swipeOut ? "animate-disperse pointer-events-none" : ""}
-  `}
-  style={{
-  backgroundColor: "#1e293b", // slate-800 base
-  backgroundImage: `url(${bgImg})`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  minHeight: '100vh',
-  minWidth: '100vw',
-}}
-
->
-
+    <div
+      className={`min-h-screen flex items-center justify-center 
+        ${swipeOut ? "animate-disperse pointer-events-none" : ""}
+      `}
+      style={{
+        backgroundColor: "#1e293b",
+        backgroundImage: `url(${bgImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+        minWidth: "100vw",
+      }}
+    >
       <div className="relative">
         {/* Progress Display */}
         <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 z-50">
           <div className="text-center">
-            <div className="text-6xl font-bold text-white mb-2">
-              {progress}%
-            </div>
+            <div className="text-6xl font-bold text-white mb-2">{progress}%</div>
           </div>
         </div>
 
@@ -400,7 +330,7 @@ if (bubblesPoppedThisFrame > 0) {
           style={{
             width: GAME_WIDTH,
             height: GAME_HEIGHT,
-            background: "rgba(0,0,0,0.4)", // dark transparent
+            background: "rgba(0,0,0,0.4)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
           }}
@@ -409,9 +339,7 @@ if (bubblesPoppedThisFrame > 0) {
           <div className="absolute inset-0 flex items-center justify-center z-40">
             <button
               className={`text-white font-bold text-2xl px-12 py-6 rounded-xl shadow-2xl border-2 border-blue-400 backdrop-blur-md bg-white/10 transition-all duration-700 transform hover:scale-105 ${
-                showEnter
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8 pointer-events-none"
+                showEnter ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"
               }`}
               onClick={handleEnter}
             >
@@ -419,33 +347,32 @@ if (bubblesPoppedThisFrame > 0) {
             </button>
 
             {/* Mobile Left/Right Controls */}
-<div className="absolute bottom-0 left-0 w-full z-40 flex justify-between md:hidden px-8 pb-6">
-  <button
-    className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
-    onTouchStart={() => setKeys((prev) => ({ ...prev, left: true }))}
-    onTouchEnd={() => setKeys((prev) => ({ ...prev, left: false }))}
-    style={{
-    userSelect: "none",
-    WebkitUserSelect: "none",
-    touchAction: "none",
-  }}
-  >
-    ◀
-  </button>
-  <button
-    className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
-    onTouchStart={() => setKeys((prev) => ({ ...prev, right: true }))}
-    onTouchEnd={() => setKeys((prev) => ({ ...prev, right: false }))}
-    style={{
-    userSelect: "none",
-    WebkitUserSelect: "none",
-    touchAction: "none",
-  }}
-  >
-    ▶
-  </button>
-</div>
-
+            <div className="absolute bottom-0 left-0 w-full z-40 flex justify-between md:hidden px-8 pb-6">
+              <button
+                className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
+                onTouchStart={() => setKeys((prev) => ({ ...prev, left: true }))}
+                onTouchEnd={() => setKeys((prev) => ({ ...prev, left: false }))}
+                style={{
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "none",
+                }}
+              >
+                ◀
+              </button>
+              <button
+                className="bg-white/30 backdrop-blur-md border border-white/50 text-white rounded-full px-6 py-4 shadow-lg text-2xl active:scale-95 transition"
+                onTouchStart={() => setKeys((prev) => ({ ...prev, right: true }))}
+                onTouchEnd={() => setKeys((prev) => ({ ...prev, right: false }))}
+                style={{
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "none",
+                }}
+              >
+                ▶
+              </button>
+            </div>
           </div>
 
           {/* Bubbles */}
@@ -453,7 +380,7 @@ if (bubblesPoppedThisFrame > 0) {
             !b.popped ? (
               <div
                 key={b.id}
-className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10px_rgba(147,197,253,0.5)] animate-glow cursor-pointer transition-transform duration-200 hover:scale-110"
+                className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10px_rgba(147,197,253,0.5)] animate-glow cursor-pointer transition-transform duration-200 hover:scale-110"
                 style={{
                   width: b.size || BUBBLE_SIZE,
                   height: b.size || BUBBLE_SIZE,
@@ -470,66 +397,63 @@ className="absolute rounded-full bg-white border border-blue-300 shadow-[0_0_10p
 
           {/* Ball */}
           <div
-  className="absolute rounded-full shadow-2xl"
-  style={{
-    width: BALL_RADIUS * 2,
-    height: BALL_RADIUS * 2,
-    left: ball.x - BALL_RADIUS,
-    top: ball.y - BALL_RADIUS,
-    zIndex: 20,
-    background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,1), rgba(255,255,255,0.85))`,
-    boxShadow: `0 0 15px rgba(255,255,255,0.7), 0 0 30px rgba(255,255,255,0.5)`,}}
-/>
-
+            className="absolute rounded-full shadow-2xl"
+            style={{
+              width: BALL_RADIUS * 2,
+              height: BALL_RADIUS * 2,
+              left: ball.x - BALL_RADIUS,
+              top: ball.y - BALL_RADIUS,
+              zIndex: 20,
+              background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,1), rgba(255,255,255,0.85))`,
+              boxShadow: `0 0 15px rgba(255,255,255,0.7), 0 0 30px rgba(255,255,255,0.5)`,
+            }}
+          />
 
           {/* Slider */}
-          {/* Slider */}
-<div
-  className="absolute bottom-6 left-0 w-full flex justify-center z-30"
-  onMouseMove={(e) => {
-    if (e.buttons === 1) handleSliderDrag(e);
-  }}
-  onTouchMove={(e) => {
-    if (e.touches.length > 0) {
-      const touch = e.touches[0];
-      handleSliderDrag({ clientX: touch.clientX });
-    }
-  }}
->
-  <div
-    className="bg-gradient-to-r from-slate-600 to-slate-700 rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all"
-    style={{
-      height: SLIDER_HEIGHT,
-      width: SLIDER_WIDTH,
-      left: sliderX,
-      position: "absolute",
-    }}
-    onMouseDown={(e) => {
-      e.preventDefault();
-      const move = (ev) => handleSliderDrag(ev);
-      const up = () => {
-        window.removeEventListener("mousemove", move);
-        window.removeEventListener("mouseup", up);
-      };
-      window.addEventListener("mousemove", move);
-      window.addEventListener("mouseup", up);
-    }}
-    onTouchStart={(e) => {
-      const move = (ev) => {
-        if (ev.touches.length > 0) {
-          handleSliderDrag({ clientX: ev.touches[0].clientX });
-        }
-      };
-      const end = () => {
-        window.removeEventListener("touchmove", move);
-        window.removeEventListener("touchend", end);
-      };
-      window.addEventListener("touchmove", move);
-      window.addEventListener("touchend", end);
-    }}
-  />
-</div>
-
+          <div
+            className="absolute bottom-6 left-0 w-full flex justify-center z-30"
+            onMouseMove={(e) => {
+              if (e.buttons === 1) handleSliderDrag(e.clientX);
+            }}
+            onTouchMove={(e) => {
+              if (e.touches.length > 0) {
+                handleSliderDrag(e.touches[0].clientX);
+              }
+            }}
+          >
+            <div
+              className="bg-gradient-to-r from-slate-600 to-slate-700 rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all"
+              style={{
+                height: SLIDER_HEIGHT,
+                width: SLIDER_WIDTH,
+                left: sliderX,
+                position: "absolute",
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                const move = (ev) => handleSliderDrag(ev.clientX);
+                const up = () => {
+                  window.removeEventListener("mousemove", move);
+                  window.removeEventListener("mouseup", up);
+                };
+                window.addEventListener("mousemove", move);
+                window.addEventListener("mouseup", up);
+              }}
+              onTouchStart={() => {
+                const move = (ev) => {
+                  if (ev.touches.length > 0) {
+                    handleSliderDrag(ev.touches[0].clientX);
+                  }
+                };
+                const end = () => {
+                  window.removeEventListener("touchmove", move);
+                  window.removeEventListener("touchend", end);
+                };
+                window.addEventListener("touchmove", move);
+                window.addEventListener("touchend", end);
+              }}
+            />
+          </div>
 
           {/* Start Game */}
           {!gameStarted && (

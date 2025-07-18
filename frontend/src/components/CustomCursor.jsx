@@ -1,47 +1,41 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 const CustomCursor = () => {
   const cursorRef = useRef(null);
   const tailRef = useRef(null);
   const rippleRef = useRef(null);
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = window.innerWidth <= 768;
 
-  // Detect mobile device
-  useEffect(() => {
-    const mobile = window.innerWidth <= 768;
-    setIsMobile(mobile);
-  }, []);
-
-  // Track mouse
+  // Track mouse and update positions directly (no state)
   useEffect(() => {
     if (isMobile) return;
 
     const move = (e) => {
-      setCoords({ x: e.clientX, y: e.clientY });
+      const x = e.clientX;
+      const y = e.clientY;
+
+      // Update main cursor immediately
+      if (cursorRef.current) {
+        cursorRef.current.style.left = `${x}px`;
+        cursorRef.current.style.top = `${y}px`;
+      }
+
+      // Update tail (CSS transition handles smoothness)
+      if (tailRef.current) {
+        tailRef.current.style.left = `${x}px`;
+        tailRef.current.style.top = `${y}px`;
+      }
+
+      // Update ripple position
       if (rippleRef.current) {
-        rippleRef.current.style.left = `${e.clientX}px`;
-        rippleRef.current.style.top = `${e.clientY}px`;
+        rippleRef.current.style.left = `${x}px`;
+        rippleRef.current.style.top = `${y}px`;
       }
     };
 
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, [isMobile]);
-
-  // Tail follow
-  useEffect(() => {
-    if (isMobile) return;
-
-    const follow = () => {
-      if (tailRef.current) {
-        tailRef.current.style.left = `${coords.x}px`;
-        tailRef.current.style.top = `${coords.y}px`;
-      }
-      requestAnimationFrame(follow);
-    };
-    follow();
-  }, [coords, isMobile]);
 
   // Ripple on click
   useEffect(() => {
@@ -50,7 +44,7 @@ const CustomCursor = () => {
     const click = () => {
       if (rippleRef.current) {
         rippleRef.current.classList.remove("ripple");
-        void rippleRef.current.offsetWidth;
+        void rippleRef.current.offsetWidth; // Force reflow
         rippleRef.current.classList.add("ripple");
       }
     };
@@ -59,7 +53,7 @@ const CustomCursor = () => {
     return () => window.removeEventListener("click", click);
   }, [isMobile]);
 
-  if (isMobile) return null; // ❌ Skip rendering on mobile
+  if (isMobile) return null; // Skip rendering on mobile
 
   return (
     <>
@@ -80,10 +74,11 @@ const CustomCursor = () => {
           pointer-events: none;
           mix-blend-mode: difference;
           z-index: 9998;
+          will-change: transform, opacity;
         }
 
         .ripple {
-          animation: rippleAnim 0.4s ease-out;
+          animation: rippleAnim 0.3s ease-out;
         }
 
         @keyframes rippleAnim {
@@ -103,8 +98,6 @@ const CustomCursor = () => {
         ref={cursorRef}
         style={{
           position: "fixed",
-          left: `${coords.x}px`,
-          top: `${coords.y}px`,
           width: "16px",
           height: "16px",
           borderRadius: "50%",
@@ -114,10 +107,11 @@ const CustomCursor = () => {
           transform: "translate(-50%, -50%)",
           mixBlendMode: "difference",
           zIndex: 9999,
+          willChange: "transform",
         }}
       />
 
-      {/* Tail */}
+      {/* Tail (with CSS transition for smooth trailing) */}
       <div
         ref={tailRef}
         style={{
@@ -126,17 +120,19 @@ const CustomCursor = () => {
           height: "16px",
           borderRadius: "50%",
           backgroundColor: "white",
-          opacity: 0.1,
-          filter: "blur(6px)",
+          opacity: 0.15, // Slightly increased from 0.1 for visibility, but still subtle
+          filter: "blur(4px)", // Reduced from 6px to lessen GPU load
           transform: "translate(-50%, -50%)",
           pointerEvents: "none",
           mixBlendMode: "difference",
           zIndex: 9998,
+          transition: "left 0.1s ease-out, top 0.1s ease-out", // Smooth trailing effect
+          willChange: "transform",
         }}
       />
 
       {/* Ripple */}
-      <div ref={rippleRef} className="ripple-effect"></div>
+      <div ref={rippleRef} className="ripple-effect" />
     </>
   );
 };
